@@ -1,31 +1,43 @@
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
 import time
 import os
 
-file_path = "file://" + os.path.abspath("index.html")
+# Chrome headless options for CI
+chrome_options = Options()
+chrome_options.add_argument("--headless=new")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("--window-size=1920,1080")
 
-driver = webdriver.Chrome()
+driver = webdriver.Chrome(options=chrome_options)
+
+# Open local index.html
+file_path = "file://" + os.path.join(os.getcwd(), "index.html")
 driver.get(file_path)
 
-player = driver.find_element(By.ID, "player")
-game_area = driver.find_element(By.ID, "gameArea")
+player = driver.find_element("id", "player")
 
-player.send_keys(Keys.SPACE)
+# Jump test
+driver.execute_script("document.dispatchEvent(new KeyboardEvent('keydown', {'code':'Space'}));")
 time.sleep(1)
-top_pos = int(player.value_of_css_property('top').replace('px',''))
-assert top_pos < game_area.size['height']
+top_after_jump = driver.execute_script("return document.getElementById('player').getBoundingClientRect().top")
+print("Top after jump:", top_after_jump)
+assert top_after_jump < 400  # ground is 400px
 
-player.send_keys(Keys.ARROW_RIGHT)
-time.sleep(0.5)
-right_pos = int(player.value_of_css_property('left').replace('px',''))
-assert right_pos > 0
+# Move right
+driver.execute_script("document.dispatchEvent(new KeyboardEvent('keydown', {'code':'ArrowRight'}));")
+time.sleep(0.6)
+left_after_right = driver.execute_script("return document.getElementById('player').getBoundingClientRect().left")
+print("Left after right:", left_after_right)
+assert left_after_right > 0
 
-player.send_keys(Keys.ARROW_LEFT)
-time.sleep(0.5)
-left_pos = int(player.value_of_css_property('left').replace('px',''))
-assert left_pos >= 0
+# Move left
+driver.execute_script("document.dispatchEvent(new KeyboardEvent('keydown', {'code':'ArrowLeft'}));")
+time.sleep(0.6)
+left_after_left = driver.execute_script("return document.getElementById('player').getBoundingClientRect().left")
+print("Left after left:", left_after_left)
+assert left_after_left >= 0
 
 driver.quit()
-print("Selenium UI test passed!")

@@ -1,0 +1,21 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
+#gameArea {
+  width: 400px;
+  height: 300px;
+  border: 2px solid black;
+  position: relative;
+  overflow: hidden;
+  background-color: #eef;
+}
+
+#player {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background-color: red;
+}

@@ -5,7 +5,7 @@ let isJumping = false;
 let velocityY = 0;
 let isMovingLeft = false;
 let isMovingRight = false;
-
+player.style.left = "0px";  // initialize
 const gravity = 0.8;
 const speed = 5;
 const groundY = gameArea.clientHeight - player.clientHeight;
